@@ -194,6 +194,7 @@ function checkout_and_commit_hotfix {
     "    
     git stash pop
     git add .
+    git commit -m"test"
     ## change log message
     ## git commit message
 }
