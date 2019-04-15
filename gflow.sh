@@ -1,26 +1,9 @@
+####### Global Variables
 cmd=$1
 subcmd=$2
 config_file="config.json"
 
-function is_new_project {
-    echo "GFlow is not yet initialized for this Project."
-    echo "Is this a new project that you want to initialize?(Y, n):"
-    read is_new_project
-}
-
-function create_config_file {
-    if [ -z "$1" ]; then
-        version=0.1.0
-    else
-        version=$1
-    fi
-    echo "
-    {
-        \"version\": \"$version\"
-    }
-    " > $config_file
-    echo "Gflow Config File Intialized with version ($version)"
-}
+##################### Init Command Begin  ###################
 
 function init {
     if [ -e "$config_file" ]; then
@@ -44,6 +27,26 @@ function perform_flow_init {
     fi
 }
 
+function is_new_project {
+    echo "GFlow is not yet initialized for this Project."
+    echo "Is this a new project that you want to initialize?(Y, n):"
+    read is_new_project
+}
+
+function create_config_file {
+    if [ -z "$1" ]; then
+        version=0.1.0
+    else
+        version=$1
+    fi
+    echo "
+    {
+        \"version\": \"$version\"
+    }
+    " > $config_file
+    echo "Gflow Config File Intialized with version ($version)"
+}
+
 function ask_user_version {
     echo "What is the current version of your project?"
     read entered_version
@@ -62,6 +65,11 @@ function is_valid_version {
     fi
 }
 
+##################### Init Command End  ###################
+
+##################### Commit Command Begin  ###################
+
+##################### Commit Command End  ###################
 if [ -z "$cmd" ]; then
     echo "
 Wrong command, these are the commands supported so far
