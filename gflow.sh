@@ -68,6 +68,12 @@ function select_option {
 
     return $selected
 }
+
+function get_current_version {
+    tmp_v=1.1.2    
+    return 1.1.2
+}
+
 ##################### Init Command Begin  ###################
 
 function init {
@@ -173,21 +179,23 @@ function ask_for_commit_type {
 }
 
 function checkout_and_commit_hotfix {
-    ## git add .
-    ## git stash
-    ## git checkout master
-    ## read version number
+    git add .
+    git stash
+    git checkout master
+    old_v=get_current_version        
     ## increment version number
-    ## switch to new branch named hotfix-version
+    new_v="2.2.2"
+    hotfix_branch_name="hotfix-$new_v"
+    git checkout -b $hotfix_branch_name
     ## pump version 
-    ## commit pumped version
-    ## git stash pop
+    git add .
+    git commit -m"
+    Pump Version from $old_v to $new_v
+    "    
+    git stash pop
+    git add .
     ## change log message
     ## git commit message
-
-    v=0
-    hotfix_branch_name="hotfix-$v"
-    echo $hotfix_branch_name
 }
 
 function checkout_and_commit_feature {
