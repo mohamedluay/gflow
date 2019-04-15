@@ -186,7 +186,7 @@ function checkout_and_commit_hotfix {
     ## increment version number
     new_v="2.2.2"
     hotfix_branch_name="hotfix-$new_v"
-    git checkout -b $hotfix_branch_name
+    git checkout $hotfix_branch_name || git checkout -b $hotfix_branch_name
     ## pump version 
     git add .
     git commit -m"
