@@ -1,6 +1,4 @@
 ##################### Global Variables & Function  ###################
-cmd=$1
-subcmd=$2
 config_file="config.json"
 
 function warning_color {
@@ -70,10 +68,18 @@ function select_option {
 }
 
 function get_current_version {
-    tmp_v=1.1.2    
-    return 1.1.2
+    tmp_v=$(sed -n 's/.*"version": "\([^"]*\)"/\1/p' config.json)
+    tmp_v=( ${tmp_v//./ } ) 
 }
 
+function pump_version {
+    version="$1"
+     echo "
+    {
+        \"version\": \"$version\"
+    }
+    " > $config_file
+}
 ##################### Init Command Begin  ###################
 
 function init {
@@ -111,11 +117,7 @@ function create_config_file {
     else
         version=$1
     fi
-    echo "
-    {
-        \"version\": \"$version\"
-    }
-    " > $config_file
+    pump_version $version    
     echo "Gflow Config File Intialized with version ($version)"
 }
 
@@ -144,7 +146,6 @@ function is_valid_version {
 
 function commit {
     current_branch="$(git symbolic-ref --short -q HEAD)"
-    echo "$current_branch"
     is_protected_branch
 }
 
@@ -182,12 +183,12 @@ function checkout_and_commit_hotfix {
     git add .
     git stash
     git checkout master
-    old_v=get_current_version        
-    ## increment version number
-    new_v="2.2.2"
+    get_current_version
+    ((tmp_v[2]++)) ## increment Patch version number    
+    new_v="${tmp_v[0]}.${tmp_v[1]}.${tmp_v[2]}"
     hotfix_branch_name="hotfix-$new_v"
-    git checkout -b $hotfix_branch_name
-    ## pump version 
+    pump_version $new_v ## pump version 
+    git checkout $hotfix_branch_name || git checkout -b $hotfix_branch_name
     git add .
     git commit -m"
     Pump Version from $old_v to $new_v
@@ -208,6 +209,8 @@ function checkout_and_commit_release {
 }   
 
 ##################### Commit Command End  ###################
+cmd=$1
+subcmd=$2
 if [ -z "$cmd" ]; then
     echo "
 Wrong command, these are the commands supported so far
@@ -217,6 +220,8 @@ Wrong command, these are the commands supported so far
         - release    Release A version 
         - help       Help comand
     "
+    get_current_version
+    echo "${tmp_v[1]}"
 else
     if [ "$cmd" = "init" ]; then    
         init $subcmd
@@ -224,3 +229,5 @@ else
         commit
     fi
 fi
+
+User=$( sed -n 's/.*"version": "\(.*\)",/\1/p' config.json )
