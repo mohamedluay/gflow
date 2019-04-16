@@ -186,16 +186,16 @@ function checkout_and_commit_hotfix {
     get_current_version
     ((tmp_v[2]++)) ## increment Patch version number    
     new_v="${tmp_v[0]}.${tmp_v[1]}.${tmp_v[2]}"
-    hotfix_branch_name="hotfix-$new_v"
-    pump_version $new_v ## pump version 
+    hotfix_branch_name="hotfix-$new_v"    
     git checkout $hotfix_branch_name || git checkout -b $hotfix_branch_name
-    git add .
-    git commit -m"
-    Pump Version from $old_v to $new_v
-    "    
-    git stash pop
-    git add .
-    git commit -m"test"
+    pump_version $new_v ## pump version 
+    # git add .
+    # git commit -m"
+    # Pump Version from $old_v to $new_v
+    # "    
+    # git stash pop
+    # git add .
+    # git commit -m"test"
     ## change log message
     ## git commit message
 }
