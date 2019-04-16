@@ -187,8 +187,8 @@ function checkout_and_commit_hotfix {
     ((tmp_v[2]++)) ## increment Patch version number    
     new_v="${tmp_v[0]}.${tmp_v[1]}.${tmp_v[2]}"
     hotfix_branch_name="hotfix-$new_v"
-    git checkout -b $hotfix_branch_name
     pump_version $new_v ## pump version 
+    git checkout $hotfix_branch_name || git checkout -b $hotfix_branch_name
     git add .
     git commit -m"
     Pump Version from $old_v to $new_v
