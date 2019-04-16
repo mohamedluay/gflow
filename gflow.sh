@@ -189,13 +189,13 @@ function checkout_and_commit_hotfix {
     hotfix_branch_name="hotfix-$new_v"    
     git checkout $hotfix_branch_name || git checkout -b $hotfix_branch_name
     pump_version $new_v ## pump version 
-    # git add .
-    # git commit -m"
-    # Pump Version from $old_v to $new_v
-    # "    
-    # git stash pop
-    # git add .
-    # git commit -m"test"
+    git add .
+    git commit -m"
+    Pump Version from $old_v to $new_v
+    "    
+    git stash pop
+    git add .
+    git commit -m"test"
     ## change log message
     ## git commit message
 }
