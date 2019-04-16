@@ -181,7 +181,8 @@ function ask_for_commit_type {
 
 function checkout_and_commit_hotfix {
     git add .
-    git stash
+    stash_message="$(git stash)"
+    echo $stash_message
     git checkout master
     get_current_version
     ((tmp_v[2]++)) ## increment Patch version number    
@@ -192,10 +193,12 @@ function checkout_and_commit_hotfix {
     git add .
     git commit -m"
     Pump Version from $old_v to $new_v
-    "    
-    git stash pop
-    git add .
-    git commit -m"test"
+    "
+    if [ "$stash_message" != "No local changes to save" ]; then    
+        git stash pop
+        git add .
+        git commit -m"test" 
+    fi    
     ## change log message
     ## git commit message
 }
