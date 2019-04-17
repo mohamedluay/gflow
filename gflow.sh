@@ -1,8 +1,20 @@
 ##################### Global Variables & Function  ###################
 config_file="config.json"
 
-function warning_color {
+function error_color {
     tput setaf 1; 
+}
+
+function warning_color {
+    tput setaf 3; 
+}
+
+function success_color {
+    tput setaf 2; 
+}
+
+function highlight_color {
+    tput setaf 5; 
 }
 
 function ordinary_color {
@@ -88,7 +100,7 @@ function init {
             perform_flow_init
         else
             echo "Workflow Already Initialized, in order to re intialize write"
-            warning_color
+            highlight_color
             echo "  - gflow init --f"
         fi    
     else
@@ -119,6 +131,7 @@ function create_config_file {
     fi
     pump_version $version    
     echo "Gflow Config File Intialized with version ($version)"
+    ## Commit & push init
 }
 
 function ask_user_version {
@@ -132,7 +145,7 @@ function is_valid_version {
     if [[ "$entered_version" =~ $rx ]]; then
         create_config_file $entered_version
     else
-        warning_color
+        error_color
         echo "ERROR:<->Version Number is not valid: '$entered_version'"    
         echo "Version number should be something like 3.2.88'"    
         ordinary_color        
@@ -140,18 +153,31 @@ function is_valid_version {
     fi
 }
 
+function stash_changes {
+    git add .
+    git stash
+}
+
+function load_stashed {
+    git stash pop
+}
 ##################### Init Command End  ###################
 
 ##################### Commit Command Begin  ###################
 
 function commit {
-    current_branch="$(git symbolic-ref --short -q HEAD)"
-    is_protected_branch
+    # Check if directory is clean 
+    if [ -z "$(git status --porcelain)" ]; then 
+        echo "$(git status)"
+    else 
+        current_branch="$(git symbolic-ref --short -q HEAD)"
+        is_protected_branch
+    fi
 }
 
 function is_protected_branch {
     if [ "$current_branch"="master" ] || [ "$current_branch"="develop" ]; then
-        show_wrong_branch_warning
+        show_wrong_branch_warning        
         ask_for_commit_type
     else
         echo "Nah"
@@ -160,11 +186,19 @@ function is_protected_branch {
 }
 
 function show_wrong_branch_warning {
-    warning_color
+    error_color
     echo "$current_branch branch is a protected branch; you can't commit to it!!!"
     echo "For more info about the gitflow used, check the link below 👇"
-    ordinary_color
+    highlight_color
     echo "https://nvie.com/posts/a-successful-git-branching-model/"
+    ordinary_color
+}
+
+function check_if_any_update_exists {
+    status="$(git status)"
+    status=( ${status//,/ } )
+    echo "${status}"
+    echo "${status[5]}"
 }
 
 function ask_for_commit_type {
@@ -180,27 +214,36 @@ function ask_for_commit_type {
 }
 
 function checkout_and_commit_hotfix {
-    git add .
-    stash_message="$(git stash)"
-    echo $stash_message
+    stash_changes
     git checkout master
     get_current_version
     ((tmp_v[2]++)) ## increment Patch version number    
     new_v="${tmp_v[0]}.${tmp_v[1]}.${tmp_v[2]}"
     hotfix_branch_name="hotfix-$new_v"    
-    git checkout $hotfix_branch_name || git checkout -b $hotfix_branch_name
-    pump_version $new_v ## pump version 
-    git add .
-    git commit -m"
-    Pump Version from $old_v to $new_v
-    "
-    if [ "$stash_message" != "No local changes to save" ]; then    
-        git stash pop
+    ### check if remote branch exitsts
+    if [ `git branch --list $hotfix_branch_name` ]; then
+        warning_color        
+        echo "Branch name $hotfix_branch_name already exists." 
+        ordinary_color
+        git checkout $hotfix_branch_name
+    else
+        success_color
+        echo "New Branch $hotfix_branch_name has been created" 
+        git checkout -b $hotfix_branch_name
+        pump_version $new_v ## pump version 
         git add .
-        git commit -m"test" 
+        git commit -m"
+        Pump Version from $old_v to $new_v
+        "
+        echo "Version $new_v pumped & commited"
+        ordinary_color
     fi    
+    load_stashed
+    git add .
+    git commit -m"test"
     ## change log message
     ## git commit message
+         
 }
 
 function checkout_and_commit_feature {
