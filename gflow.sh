@@ -117,6 +117,7 @@ function commit_code {
             echo "=========================="
             echo "$commit_message"
             ordinary_color
+            load_stashed 
             git add .
             git commit -m "$commit_message"
         fi
@@ -175,6 +176,14 @@ function does_temp_changelog_exists {
         return 1
     fi
 }
+
+function abort_commit {
+    error_color
+    echo "Commit Has Been Aborted!!"
+    git checkout $current_branch
+    load_stashed    
+}
+
 ##################### Init Command Begin  ###################
 
 function init {
@@ -324,8 +333,7 @@ function checkout_and_commit_hotfix {
         "
         echo "Version $new_v pumped & commited"
         ordinary_color
-    fi    
-    load_stashed    
+    fi           
     commit_code
 }
 
