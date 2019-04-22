@@ -112,9 +112,12 @@ function commit_code {
             echo "hi"
             # commit_code
         else
-            echo "##############"
             commit_message="$(git diff --color $temp_changelog_file | perl -wlne 'print $1 if /^\e\[32m\+\e\[m\e\[32m(.*)\e\[m$/')"
+            success_color
+            echo "Commit Message"
+            echo "=========================="
             echo "$commit_message"
+            ordinary_color
             git add .
             git commit -m "$commit_message"
         fi
