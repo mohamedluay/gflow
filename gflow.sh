@@ -135,7 +135,7 @@ function reset_changelog {
 This File Will Contain the Temp Change log until this version get deployed, items in this change log will be added to your commit message by default
 
 ## [Unreleased]
-## [$version] - date +%Y-%m-%d
+## [$version] - $(date +%F_%H:%M:%S)
 ### Added
 -
 
