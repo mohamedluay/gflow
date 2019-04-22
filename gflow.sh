@@ -1,6 +1,8 @@
 ##################### Global Variables & Function  ###################
 gflow_folder_name="./.gflow"
 config_file="$gflow_folder_name/config.json"
+temp_changelog_file="$gflow_folder_name/temp_changelog.md"
+
 
 function error_color {
     tput setaf 1; 
@@ -102,6 +104,62 @@ function create_file {
     touch "$1"
 }
 
+function commit_code {
+    vim $temp_changelog_file
+    if  does_temp_changelog_exists; then
+        is_modified="$(git diff $temp_changelog_file)"
+        if [ -z "$is_modified" ]; then
+            echo "hi"
+            # commit_code
+        else
+            echo "##############"
+            commit_message="$(git diff --color $temp_changelog_file | perl -wlne 'print $1 if /^\e\[32m\+\e\[m\e\[32m(.*)\e\[m$/')"
+            echo "$commit_message"
+            git add .
+            git commit -m "$commit_message"
+        fi
+    else
+        echo "hi"
+        # commit_code
+    fi    
+}
+
+function reset_changelog {
+    rm "$temp_changelog_file"
+    create_file $temp_changelog_file
+     echo "
+# Temp Changelog
+This File Will Contain the Temp Change log until this version get deployed, items in this change log will be added to your commit message by default
+
+## [Unreleased]
+## [$version] - date +%Y-%m-%d
+### Added
+-
+
+### Changed
+-
+
+### Removed
+-
+
+### Deprecated
+- 
+
+### Fixed
+-
+### Security
+-         
+    " > $temp_changelog_file
+    
+}
+
+function does_temp_changelog_exists {
+    if [ -e "$temp_changelog_file" ]; then
+        return 0
+    else
+        return 1
+    fi
+}
 ##################### Init Command Begin  ###################
 
 function init {
@@ -240,10 +298,11 @@ function checkout_and_commit_hotfix {
         ordinary_color
         git checkout $hotfix_branch_name
     else
-        success_color
-        echo "New Branch $hotfix_branch_name has been created" 
+        success_color        
         git checkout -b $hotfix_branch_name
+        echo "New Branch $hotfix_branch_name has been created" 
         pump_version $new_v ## pump version 
+        reset_changelog ## Reset Changelog File
         git add .
         git commit -m"
         Pump Version from $old_v to $new_v
@@ -251,12 +310,8 @@ function checkout_and_commit_hotfix {
         echo "Version $new_v pumped & commited"
         ordinary_color
     fi    
-    load_stashed
-    git add .
-    git commit -m"test"
-    ## change log message
-    ## git commit message
-         
+    load_stashed    
+    commit_code
 }
 
 function checkout_and_commit_feature {
@@ -279,8 +334,6 @@ Wrong command, these are the commands supported so far
         - release    Release A version 
         - help       Help comand
     "
-    get_current_version
-    echo "${tmp_v[1]}"
 else
     if [ "$cmd" = "init" ]; then    
         init $subcmd
@@ -288,6 +341,3 @@ else
         commit
     fi
 fi
-
-jsdiff=`git diff change.test.txt`
-echo $jsdiff
