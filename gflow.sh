@@ -109,8 +109,7 @@ function commit_code {
     if  does_temp_changelog_exists; then
         is_modified="$(git diff $temp_changelog_file)"
         if [ -z "$is_modified" ]; then
-            echo "hi"
-            # commit_code
+            warn_about_empty_changelog
         else
             commit_message="$(git diff --color $temp_changelog_file | perl -wlne 'print $1 if /^\e\[32m\+\e\[m\e\[32m(.*)\e\[m$/')"
             success_color
@@ -122,9 +121,22 @@ function commit_code {
             git commit -m "$commit_message"
         fi
     else
-        echo "hi"
-        # commit_code
+        warn_about_empty_changelog
     fi    
+}
+
+function warn_about_empty_changelog {
+    error_color
+    echo "You have to update the temp changelog in order to commit your work 🚨"
+    echo "Updated Change log will be used in commit message 💬"
+    ordinary_color
+    options=("1- try again ⚙️" "2- Abort Commit 🛑🚦")
+    select_option "${options[@]}"    
+    choice=$?
+    case $choice in
+        0) commit_code;;
+        1) abort_commit;;
+    esac
 }
 
 function reset_changelog {
