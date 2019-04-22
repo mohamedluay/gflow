@@ -1,5 +1,5 @@
 ##################### Global Variables & Function  ###################
-config_file="config.json"
+config_file="./.gflow/config.json"
 
 function warning_color {
     tput setaf 1; 

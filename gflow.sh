@@ -1,5 +1,6 @@
 ##################### Global Variables & Function  ###################
-config_file="config.json"
+gflow_folder_name="./.gflow"
+config_file="$gflow_folder_name/config.json"
 
 function error_color {
     tput setaf 1; 
@@ -92,9 +93,19 @@ function pump_version {
     }
     " > $config_file
 }
+
+function create_cli_directory {
+    mkdir "$gflow_folder_name"
+}
+
+function create_file {
+    touch "$1"
+}
+
 ##################### Init Command Begin  ###################
 
 function init {
+    echo "$config_file"
     if [ -e "$config_file" ]; then
         if [ "$1" = "--f" ]; then
             perform_flow_init
@@ -128,7 +139,9 @@ function create_config_file {
         version=0.1.0
     else
         version=$1
-    fi
+    fi    
+    create_cli_directory
+    create_file "$config_file"
     pump_version $version    
     echo "Gflow Config File Intialized with version ($version)"
     ## Commit & push init
@@ -276,4 +289,5 @@ else
     fi
 fi
 
-User=$( sed -n 's/.*"version": "\(.*\)",/\1/p' config.json )
+jsdiff=`git diff change.test.txt`
+echo $jsdiff
