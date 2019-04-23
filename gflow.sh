@@ -270,13 +270,13 @@ function is_valid_version {
 }
 
 function stash_changes {
-    git add .
-    git stash
+    git stash save -u # to stash untracked files
 }
 
 function load_stashed {
-    git stash apply
+    git stash apply # apply the last stash without deleting it
 }
+
 ##################### Init Command End  ###################
 
 ##################### Commit Command Begin  ###################
