@@ -149,22 +149,43 @@ This File Will Contain the Temp Change log until this version get deployed, item
 
 ## [Unreleased]
 ## [$version] - $(date +%F_%H:%M:%S)
+
 ### Added
--
+[A]- 
+[A]-
+[A]-
+[A]-
 
 ### Changed
--
+[C]- 
+[C]-
+[C]-
+[C]-
 
 ### Removed
--
+[R]- 
+[R]-
+[R]-
+[R]-
 
 ### Deprecated
-- 
+[D]- 
+[D]-
+[D]-
+[D]-
 
 ### Fixed
--
+[F]-
+[F]-
+[F]-
+[F]-
+
 ### Security
--         
+[S]-
+[S]-
+[S]-
+[S]-
+         
     " > $temp_changelog_file
     
 }
