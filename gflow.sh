@@ -275,7 +275,7 @@ function stash_changes {
 }
 
 function load_stashed {
-    git stash pop
+    git stash apply
 }
 ##################### Init Command End  ###################
 
