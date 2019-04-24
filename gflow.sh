@@ -319,13 +319,12 @@ function check_if_any_update_exists {
 
 function ask_for_commit_type {
     echo "Please choose the type of your commit from the options below to CONTINUE 👇"
-    options=("1- Hot fix 🔧" "2- New Feature ⚙️" "3- New Release 🏗")
+    options=("1- Hot fix 🔧" "2- New Feature ⚙️")
     select_option "${options[@]}"
     choice=$?
     case $choice in
         0) checkout_and_commit_hotfix;;
         1) checkout_and_commit_feature;;
-        2) checkout_and_commit_release;;
     esac
 }
 
@@ -362,24 +361,45 @@ function checkout_and_commit_feature {
     echo "Feature"
 }
 
-function checkout_and_commit_release {
-    #stash_changes
+##################### Commit Command End  ###################
+
+##################### Create_Release Command Begin  ###################
+
+function create_release {
     #git checkout develop
     get_current_version
-    echo ${tmp_v[2]}
     version_option_1="$((tmp_v[0] + 1)).0.0"
     version_option_2="${tmp_v[0]}.$((tmp_v[1] + 1)).0"
     version_option_3="${tmp_v[0]}.${tmp_v[1]}.$((tmp_v[2] + 1))"
     options=("$version_option_1" "$version_option_2" "$version_option_3")
     select_option "${options[@]}"
     choice=$?
-    case $choice in
-        0) echo "1";;
-        1) echo "2";;
-        2) echo "3";;
-    esac
+    create_release_branch_with_version ${options[$choice]}
     
 }   
+
+function create_release_branch_with_version {
+    release_version="$1"
+    release_branch_name="release-$release_version"    
+    if [ `git branch --list $release_branch_name` ]; then
+        warning_color        
+        echo "Branch name $release_branch_name already exists." 
+        ordinary_color
+        git checkout $release_branch_name
+    else
+        success_color   
+        git checkout -b $release_branch_name develop     
+        echo "New Branch $release_branch_name has been created" 
+        pump_version $release_version ## pump version 
+        git add .
+        git commit -m"
+        Pump Version from $old_v to $new_v
+        "
+        echo "Version $new_v pumped & commited"
+        ordinary_color
+    fi           
+}
+
 
 ##################### Commit Command End  ###################
 cmd=$1
@@ -390,7 +410,7 @@ Wrong command, these are the commands supported so far
         - init       Init the Project's Workflow
         - commit     Do a Commit flow
         - merge      Do a merge request flow to develop
-        - release    Release A version 
+        - create_release   Create Release Branch Release A version 
         - help       Help comand
     "
 else
@@ -398,5 +418,8 @@ else
         init $subcmd
     elif [ "$cmd" = "commit" ]; then    
         commit
+    elif [ "$cmd" = "create_release" ]; then    
+        create_release
     fi
+
 fi
