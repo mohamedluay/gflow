@@ -83,7 +83,7 @@ function select_option {
 }
 
 function get_current_version {
-    tmp_v=$(sed -n 's/.*"version": "\([^"]*\)"/\1/p' config.json)
+    tmp_v=$(sed -n 's/.*"version": "\([^"]*\)"/\1/p' $config_file)
     tmp_v=( ${tmp_v//./ } ) 
 }
 
@@ -363,7 +363,22 @@ function checkout_and_commit_feature {
 }
 
 function checkout_and_commit_release {
-    echo "release"
+    #stash_changes
+    #git checkout develop
+    get_current_version
+    echo ${tmp_v[2]}
+    version_option_1="$((tmp_v[0] + 1)).0.0"
+    version_option_2="${tmp_v[0]}.$((tmp_v[1] + 1)).0"
+    version_option_3="${tmp_v[0]}.${tmp_v[1]}.$((tmp_v[2] + 1))"
+    options=("$version_option_1" "$version_option_2" "$version_option_3")
+    select_option "${options[@]}"
+    choice=$?
+    case $choice in
+        0) echo "1";;
+        1) echo "2";;
+        2) echo "3";;
+    esac
+    
 }   
 
 ##################### Commit Command End  ###################
