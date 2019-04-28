@@ -105,6 +105,7 @@ function create_file {
 }
 
 function commit_code {
+    commit_param_1="$1"
     vim $temp_changelog_file
     if  does_temp_changelog_exists; then
         is_modified="$(git diff $temp_changelog_file)"
@@ -117,7 +118,10 @@ function commit_code {
             echo "=========================="
             echo "$commit_message"
             ordinary_color
-            load_stashed 
+            if ["$commit_param_1" = "load_stashed"]; then
+                echo "hi"
+                load_stashed 
+            fi
             git add .
             git commit -m "$commit_message"
         fi
@@ -135,7 +139,7 @@ function warn_about_empty_changelog {
     select_option "${options[@]}"    
     choice=$?
     case $choice in
-        0) commit_code;;
+        0) commit_code load_stashed;;
         1) abort_commit;;
     esac
 }
@@ -354,11 +358,38 @@ function checkout_and_commit_hotfix {
         echo "Version $new_v pumped & commited"
         ordinary_color
     fi           
-    commit_code
+    commit_code load_stashed
 }
 
 function checkout_and_commit_feature {
-    echo "Feature"
+    echo "What do you want to call this feature branch?"
+    read feature_branch_name  
+    checkout_feature_branch $feature_branch_name 
+}
+
+function checkout_feature_branch {
+    ## CHeck if there is stashed data
+    ## check if branch name contains any restricted names
+    ## modify commit Function to allow commiting without loading stash
+    feature_branch_name="$1"
+    # stash_changes
+    ### check if remote branch exitsts
+    if [ `git branch --list $feature_branch_name` ]; then
+        warning_color        
+        echo "Branch name $feature_branch_name already exists." 
+        ordinary_color
+        git checkout $feature_branch_name
+    else
+        success_color        
+        git checkout -b $feature_branch_name develop
+        echo "New Branch $feature_branch_name has been created" 
+        reset_changelog ## Reset Changelog File
+        git add .
+        git commit -m"
+        Reset Changelog for this new branch
+        "
+        ordinary_color
+    fi           
 }
 
 ##################### Commit Command End  ###################
@@ -421,6 +452,17 @@ else
         commit
     elif [ "$cmd" = "create_release" ]; then    
         create_release
+    elif [ "$cmd" = "create_feature" ]; then    
+        checkout_and_commit_feature
+    elif [ "$cmd" = "create_hotfix" ]; then    
+        ### Implement a mechanism in order to check if there is any change to this branch
+        ### Implement Abort Needed Variables to abort operation any time
+        checkout_and_commit_hotfix
+    elif [ "$cmd" = "release" ]; then    
+        create_release
+    elif [ "$cmd" = "merge_develop" ]; then    
+        create_release
     fi
+
 
 fi
