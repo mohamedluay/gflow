@@ -363,33 +363,11 @@ function checkout_and_commit_hotfix {
 
 function checkout_and_commit_feature {
     echo "What do you want to call this feature branch?"
-    read feature_branch_name  
+    feature_branch_name="$(ask_for_feature_branch_name)"    
+    local feature_branch_name=$?    
+    stash_changes
     checkout_feature_branch $feature_branch_name 
-}
-
-function checkout_feature_branch {
-    ## CHeck if there is stashed data
-    ## check if branch name contains any restricted names
-    ## modify commit Function to allow commiting without loading stash
-    feature_branch_name="$1"
-    # stash_changes
-    ### check if remote branch exitsts
-    if [ `git branch --list $feature_branch_name` ]; then
-        warning_color        
-        echo "Branch name $feature_branch_name already exists." 
-        ordinary_color
-        git checkout $feature_branch_name
-    else
-        success_color        
-        git checkout -b $feature_branch_name develop
-        echo "New Branch $feature_branch_name has been created" 
-        reset_changelog ## Reset Changelog File
-        git add .
-        git commit -m"
-        Reset Changelog for this new branch
-        "
-        ordinary_color
-    fi           
+    commit_code load_stashed    
 }
 
 ##################### Commit Command End  ###################
@@ -433,7 +411,58 @@ function create_release_branch_with_version {
 }
 
 
-##################### Commit Command End  ###################
+##################### Create_Release Command End  ###################
+
+##################### Create_Feature Command Begin  ###################
+
+function create_feature {    
+    echo "What do you want to call this feature branch?"
+    feature_branch_name="$(ask_for_feature_branch_name)"
+    echo "$feature_branch_name"   
+    if [ -z "$(git status --porcelain)" ]; then 
+        checkout_feature_branch $feature_branch_name 
+    else
+        stash_changes
+        checkout_feature_branch $feature_branch_name 
+        commit_code load_stashed
+    fi
+}
+
+function ask_for_feature_branch_name {
+    local __feature_branch_name
+    read __feature_branch_name  
+    echo "$__feature_branch_name"
+}
+
+function checkout_feature_branch {
+    ## CHeck if there is stashed data
+    ## check if branch name contains any restricted names
+    ## modify commit Function to allow commiting without loading stash
+    echo $feature_branch_name
+    local feature_branch_name="$1"
+    # stash_changes
+    ### check if remote branch exitsts
+    if [ `git branch --list $feature_branch_name` ]; then
+        warning_color        
+        echo "Branch name $feature_branch_name already exists." 
+        ordinary_color
+        git checkout $feature_branch_name
+    else
+        success_color        
+        git checkout -b $feature_branch_name develop
+        echo "New Branch $feature_branch_name has been created" 
+        reset_changelog ## Reset Changelog File
+        git add .
+        git commit -m"
+        Reset Changelog for this new branch
+        "
+        ordinary_color
+    fi           
+}
+
+
+##################### Create_Feature Command End  ###################
+
 cmd=$1
 subcmd=$2
 if [ -z "$cmd" ]; then
@@ -453,7 +482,7 @@ else
     elif [ "$cmd" = "create_release" ]; then    
         create_release
     elif [ "$cmd" = "create_feature" ]; then    
-        checkout_and_commit_feature
+        create_feature
     elif [ "$cmd" = "create_hotfix" ]; then    
         ### Implement a mechanism in order to check if there is any change to this branch
         ### Implement Abort Needed Variables to abort operation any time
