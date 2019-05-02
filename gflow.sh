@@ -205,8 +205,30 @@ function does_temp_changelog_exists {
 function abort_commit {
     error_color
     echo "Commit Has Been Aborted!!"
-    git checkout $current_branch
-    load_stashed    
+    git checkout $snapshot_current_branch    
+    if [ $snapshot_has_changes=true ] && [ $snapshot_changes_stashed=true ]; then
+        load_stashed
+    fi            
+}
+
+function take_snapshot {
+    
+    snapshot_current_branch="$(git symbolic-ref --short -q HEAD)"
+     if [ -z "$(git status --porcelain)" ]; then 
+        snapshot_has_changes["has_changes"]=true
+    else
+        snapshot_has_changes=false
+    fi    
+}
+
+function stash_changes {
+    git stash save -u # to stash untracked files
+    snapshot_changes_stashed=true
+}
+
+function load_stashed {
+    git stash apply # apply the last stash without deleting it
+    snapshot_changes_stashed=false
 }
 
 ##################### Init Command Begin  ###################
@@ -273,20 +295,13 @@ function is_valid_version {
     fi
 }
 
-function stash_changes {
-    git stash save -u # to stash untracked files
-}
-
-function load_stashed {
-    git stash apply # apply the last stash without deleting it
-}
-
 ##################### Init Command End  ###################
 
 ##################### Commit Command Begin  ###################
 
 function commit {
     # Check if directory is clean 
+    take_snapshot
     if [ -z "$(git status --porcelain)" ]; then 
         echo "$(git status)"
     else 
@@ -337,6 +352,7 @@ function ask_for_commit_type {
 ##################### Create_Release Command Begin  ###################
 
 function create_release {
+    take_snapshot
     git checkout develop
     get_current_version
     echo "The current version of the develop branch is ${tmp_v[0]}.${tmp_v[1]}.${tmp_v[2]}, which one you want to assign for the new release?!"
@@ -377,7 +393,8 @@ function create_release_branch_with_version {
 
 ##################### Create_Feature Command Begin  ###################
 
-function create_feature {    
+function create_feature { 
+    take_snapshot   
     echo "What do you want to call this feature branch?"
     feature_branch_name="$(ask_for_feature_branch_name)"
     ## check if branch name contains any restricted names
@@ -423,6 +440,7 @@ function checkout_feature_branch {
 
 ##################### Create_hotfix Command Begin  ###################
 function create_hotfix {
+    take_snapshot
      if [ -z "$(git status --porcelain)" ]; then 
         checkout_hotfix_branch
     else
