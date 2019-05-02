@@ -327,47 +327,9 @@ function ask_for_commit_type {
     select_option "${options[@]}"
     choice=$?
     case $choice in
-        0) checkout_and_commit_hotfix;;
-        1) checkout_and_commit_feature;;
+        0) create_hotfix;;
+        1) create_feature;;
     esac
-}
-
-function checkout_and_commit_hotfix {
-    stash_changes
-    git checkout master
-    get_current_version
-    ((tmp_v[2]++)) ## increment Patch version number    
-    new_v="${tmp_v[0]}.${tmp_v[1]}.${tmp_v[2]}"
-    hotfix_branch_name="hotfix-$new_v"    
-    ### check if remote branch exitsts
-    if [ `git branch --list $hotfix_branch_name` ]; then
-        warning_color        
-        echo "Branch name $hotfix_branch_name already exists." 
-        ordinary_color
-        git checkout $hotfix_branch_name
-    else
-        success_color        
-        git checkout -b $hotfix_branch_name
-        echo "New Branch $hotfix_branch_name has been created" 
-        pump_version $new_v ## pump version 
-        reset_changelog ## Reset Changelog File
-        git add .
-        git commit -m"
-        Pump Version from $old_v to $new_v
-        "
-        echo "Version $new_v pumped & commited"
-        ordinary_color
-    fi           
-    commit_code load_stashed
-}
-
-function checkout_and_commit_feature {
-    echo "What do you want to call this feature branch?"
-    feature_branch_name="$(ask_for_feature_branch_name)"    
-    local feature_branch_name=$?    
-    stash_changes
-    checkout_feature_branch $feature_branch_name 
-    commit_code load_stashed    
 }
 
 ##################### Commit Command End  ###################
@@ -418,7 +380,7 @@ function create_release_branch_with_version {
 function create_feature {    
     echo "What do you want to call this feature branch?"
     feature_branch_name="$(ask_for_feature_branch_name)"
-    echo "$feature_branch_name"   
+    ## check if branch name contains any restricted names
     if [ -z "$(git status --porcelain)" ]; then 
         checkout_feature_branch $feature_branch_name 
     else
@@ -435,12 +397,8 @@ function ask_for_feature_branch_name {
 }
 
 function checkout_feature_branch {
-    ## CHeck if there is stashed data
-    ## check if branch name contains any restricted names
-    ## modify commit Function to allow commiting without loading stash
     echo $feature_branch_name
     local feature_branch_name="$1"
-    # stash_changes
     ### check if remote branch exitsts
     if [ `git branch --list $feature_branch_name` ]; then
         warning_color        
@@ -462,6 +420,48 @@ function checkout_feature_branch {
 
 
 ##################### Create_Feature Command End  ###################
+
+##################### Create_hotfix Command Begin  ###################
+function create_hotfix {
+     if [ -z "$(git status --porcelain)" ]; then 
+        checkout_hotfix_branch
+    else
+        stash_changes
+        checkout_hotfix_branch
+        commit_code load_stashed
+    fi
+}
+
+function checkout_hotfix_branch {
+    git checkout master
+    get_current_version
+    ((tmp_v[2]++)) ## increment Patch version number    
+    new_v="${tmp_v[0]}.${tmp_v[1]}.${tmp_v[2]}"
+    hotfix_branch_name="hotfix-$new_v"    
+    ### check if remote branch exitsts
+    if [ `git branch --list $hotfix_branch_name` ]; then
+        warning_color        
+        echo "Branch name $hotfix_branch_name already exists." 
+        ordinary_color
+        git checkout $hotfix_branch_name
+    else
+        success_color        
+        git checkout -b $hotfix_branch_name
+        echo "New Branch $hotfix_branch_name has been created" 
+        pump_version $new_v ## pump version 
+        reset_changelog ## Reset Changelog File
+        git add .
+        git commit -m"
+        Pump Version from $old_v to $new_v
+        "
+        echo "Version $new_v pumped & commited"
+        ordinary_color
+    fi           
+    commit_code load_stashed
+}
+
+
+##################### Create_hotfix Command End  ###################
 
 cmd=$1
 subcmd=$2
