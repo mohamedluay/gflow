@@ -283,7 +283,8 @@ function create_config_file {
     create_file "$config_file"
     pump_version $version    
     echo "Gflow Config File Intialized with version ($version)"
-    ## Commit & push init
+    git add .
+    git commit -m"Config file initializd"
 }
 
 function ask_user_version {
@@ -496,7 +497,6 @@ function checkout_hotfix_branch {
         echo "Version $new_v pumped & commited"
         ordinary_color
     fi           
-    commit_code load_stashed
 }
 
 
