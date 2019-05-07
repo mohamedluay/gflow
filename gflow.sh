@@ -118,8 +118,7 @@ function commit_code {
             echo "=========================="
             echo "$commit_message"
             ordinary_color
-            if ["$commit_param_1" = "load_stashed"]; then
-                echo "hi"
+            if [ "$commit_param_1" = "load_stashed" ]; then
                 load_stashed 
             fi
             git add .
@@ -204,9 +203,9 @@ function does_temp_changelog_exists {
 
 function abort_commit {
     error_color
-    echo "Commit Has Been Aborted!!"
-    git checkout $snapshot_current_branch    
-    if [ $snapshot_has_changes=true ] && [ $snapshot_changes_stashed=true ]; then
+    echo "Commit Has Been Aborted!!"    
+    git checkout $snapshot_current_branch              
+    if [ $snapshot_has_changes = true ] && [ $snapshot_changes_stashed = true ]; then
         load_stashed
     fi            
 }
@@ -242,7 +241,6 @@ Wrong command, these are the commands supported so far
         - version           Get current prject version
     "
 }
-
 ##################### Init Command Begin  ###################
 
 function init {
@@ -312,7 +310,6 @@ function is_valid_version {
 ##################### Commit Command Begin  ###################
 
 function commit {
-    # Check if directory is clean 
     take_snapshot
     if [ -z "$(git status --porcelain)" ]; then 
         echo "$(git status)"
@@ -323,11 +320,18 @@ function commit {
 }
 
 function is_protected_branch {
-    if [ "$current_branch"="master" ] || [ "$current_branch"="develop" ]; then
+    if [ "$current_branch" = "master" ] || [ "$current_branch" = "develop" ]; then
         show_wrong_branch_warning        
         ask_for_commit_type
     else
-        echo "Nah"
+        echo "You are currently on branch ${current_branch}, do you want to commit these changes to it?"
+        options=("1- Yes 👍" "2- No 👎")
+        select_option "${options[@]}"
+        choice=$?
+        case $choice in
+            0) commit_changes_to_current_branch;;
+            1) ask_for_commit_type;;            
+        esac
     fi
 
 }
@@ -357,6 +361,11 @@ function ask_for_commit_type {
         0) create_hotfix;;
         1) create_feature;;
     esac
+}
+
+function commit_changes_to_current_branch {
+    stash_changes
+    commit_code load_stashed
 }
 
 ##################### Commit Command End  ###################
