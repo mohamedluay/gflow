@@ -231,6 +231,18 @@ function load_stashed {
     snapshot_changes_stashed=false
 }
 
+function print_guidlines {
+     echo "
+Wrong command, these are the commands supported so far
+        - init              Init the Project's Workflow
+        - commit            Do a Commit Flow
+        - create_release    Create Release Branch Release Flow
+        - create_feature    Create Feature Flow  
+        - create_hotfix     Create Hotfix Flow
+        - version           Get current prject version
+    "
+}
+
 ##################### Init Command Begin  ###################
 
 function init {
@@ -484,14 +496,7 @@ function checkout_hotfix_branch {
 cmd=$1
 subcmd=$2
 if [ -z "$cmd" ]; then
-    echo "
-Wrong command, these are the commands supported so far
-        - init       Init the Project's Workflow
-        - commit     Do a Commit flow
-        - merge      Do a merge request flow to develop
-        - create_release   Create Release Branch Release A version 
-        - help       Help comand
-    "
+   print_guidlines
 else
     if [ "$cmd" = "init" ]; then    
         init $subcmd
@@ -501,15 +506,18 @@ else
         create_release
     elif [ "$cmd" = "create_feature" ]; then    
         create_feature
-    elif [ "$cmd" = "create_hotfix" ]; then    
-        ### Implement a mechanism in order to check if there is any change to this branch
-        ### Implement Abort Needed Variables to abort operation any time
-        checkout_and_commit_hotfix
-    elif [ "$cmd" = "release" ]; then    
+    elif [ "$cmd" = "create_hotfix" ]; then            
+        create_hotfix
+    elif [ "$cmd" = "create_release" ]; then            
         create_release
-    elif [ "$cmd" = "merge_develop" ]; then    
-        create_release
+    elif [ "$cmd" = "version" ]; then            
+        get_current_version
+        echo "${tmp_v[0]}.${tmp_v[1]}.${tmp_v[2]}"
+    # elif [ "$cmd" = "release" ]; then    
+    #     create_release    
+    else
+        print_guidlines
     fi
 
-
 fi
+
