@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 ##################### Global Variables & Function  ###################
 gflow_folder_name="./.gflow"
 config_file="$gflow_folder_name/config.json"
