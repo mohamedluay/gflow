@@ -4,7 +4,7 @@
 gflow_folder_name="./.gflow"
 config_file="$gflow_folder_name/config.json"
 temp_changelog_file="$gflow_folder_name/temp_changelog.md"
-
+gflow_version="1.0.0"
 
 function error_color {
     tput setaf 1; 
@@ -526,6 +526,8 @@ else
         echo "${tmp_v[0]}.${tmp_v[1]}.${tmp_v[2]}"
     # elif [ "$cmd" = "release" ]; then    
     #     create_release    
+    elif [ "$cmd" = "gflow_version" ]; then            
+        echo "$gflow_version"   
     else
         print_guidlines
     fi
