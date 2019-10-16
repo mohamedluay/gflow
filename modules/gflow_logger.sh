@@ -1,5 +1,12 @@
 #!/usr/bin/env bash
 
+# avoid double inclusion
+if test "${BashInclude__logger__imported+defined}" == "defined"
+then
+    return 0
+fi
+BashInclude__logger__imported=1
+
 function gflow_log_error {
     local text_to_log="$1"
     tput setaf 1; 
