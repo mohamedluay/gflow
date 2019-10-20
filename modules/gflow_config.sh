@@ -7,16 +7,16 @@ then
 fi
 BashInclude__gflow_config__imported=1
 
-function gflow_config_get_current_project_version {
-    current_project_version=$(sed -n 's/.*"version": "\([^"]*\)"/\1/p' "$config_file")
-    current_project_version=( "${current_project_version//./ }" ) 
+function gflow_config_read_current_project_version {
+    current_project_version_text=$(sed -n 's/.*"version": "\([^"]*\)"/\1/p' "$config_file")
+    current_project_version_array=( "${current_project_version_text//./ }" ) 
 }
 
 function gflow_config_pump_project_version {
-    local version="$1"
+    local _version="$1"
      echo "
     {
-        \"version\": \"$version\"
+        \"version\": \"$_version\"
     }
     " > "$config_file"
 }
@@ -28,4 +28,16 @@ function create_cli_directory {
 function create_file {
     local file_name="$1"
     touch "$file_name"
+}
+
+function does_temp_changelog_exists {
+    if [ -e "$temp_changelog_file" ]; then
+        return 0
+    else
+        return 1
+    fi
+}
+
+function create_cli_directory {
+    mkdir "$gflow_folder_name"
 }
