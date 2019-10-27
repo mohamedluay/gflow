@@ -30,14 +30,6 @@ function create_file {
     touch "$file_name"
 }
 
-function does_temp_changelog_exists {
-    if [ -e "$temp_changelog_file" ]; then
-        return 0
-    else
-        return 1
-    fi
-}
-
 function create_cli_directory {
     mkdir "$gflow_folder_name"
 }

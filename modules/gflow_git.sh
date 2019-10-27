@@ -19,7 +19,9 @@ current_branch="$snapshot_branch"
 is_changes_stashed=false
 
 function gflow_load_snapshopt {
-  git checkout "$snapshot_branch"
+  if [ "$snapshot_branch" != "$current_branch" ]; then
+    gflow_switch_to_branch "$snapshot_branch"    
+  fi
   gflow_load_if_stashed
 }
 
@@ -39,4 +41,16 @@ function gflow_load_if_stashed {
 function do_load_stashed {
      git stash apply # apply the last stash without deleting it
      is_changes_stashed=false
+}
+
+function gflow_switch_to_branch {
+  local new_branch="$1"
+  local create_if_not_exists="${2-false}"
+  local checkout_from="$3"
+  if [ "$create_if_not_exists" = "create" ]; then
+    git checkout -b "$new_branch" $checkout_from || return 1
+  else
+    git checkout "$new_branch" $checkout_from || return 1
+  fi
+   current_branch="$new_branch"
 }
