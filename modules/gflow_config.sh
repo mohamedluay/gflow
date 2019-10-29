@@ -9,7 +9,7 @@ BashInclude__gflow_config__imported=1
 
 function gflow_config_read_current_project_version {
     current_project_version_text=$(sed -n 's/.*"version": "\([^"]*\)"/\1/p' "$config_file")
-    current_project_version_array=( "${current_project_version_text//./ }" ) 
+    current_project_version_array=( ${current_project_version_text//./ } ) 
 }
 
 function gflow_config_pump_project_version {

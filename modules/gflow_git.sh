@@ -51,9 +51,8 @@ function gflow_switch_to_branch {
 
 function gflow_create_branch {
   local new_branch="$1"
-  local checkout_from="$2"  
   # ToDo: Ask User If he/she needs to checkout to an exisiting branch, hence won't create new changelog ... etc
-  git checkout -b "$new_branch" $checkout_from || return 1    
+  git checkout -b "$new_branch" || return $FALSE    
   current_branch="$new_branch"
 }
 

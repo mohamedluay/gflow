@@ -9,7 +9,7 @@ BashInclude__gflow_changelog__imported=1
 
 function gflow_create_changelog {
     gflow_config_read_current_project_version
-    create_temp_changelog_file || catch "Error while creating temp changelog!"
+    create_temp_changelog_file || return $FALSE
     git add .
     git commit -m"Create Changelog for this new branch"
 }

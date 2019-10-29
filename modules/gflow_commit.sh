@@ -15,7 +15,7 @@ function gflow_commit {
     else
         ask_if_to_commit_to_current_branch || return $FALSE
     fi    
-    do_commit_changes || catch "Commit Failed!"
+    do_commit_changes || return $FALSE
   else
     # ToDo: Add User Name To Log
     gflow_log_warning "You don't have any changes to commit!"
@@ -27,11 +27,10 @@ function select_branch_type {
     options=("1- Hot fix 🔧" "2- New Feature ⚙️" "3- Abort Commit 🛑🚦")
     select_option "${options[@]}"
     choice=$?
-    # ToDo: Invoke Hot Fix Flow After Implementation
     case $choice in
-        0) echo "Hot Fix Selected";;
+        0) gflow_start_hotfix_flow || return $FALSE;;
         1) gflow_start_feature_flow || return $FALSE;;
-        2) catch "User Aborted Commit";;
+        2) return $FALSE;;
     esac
 }
 
@@ -56,7 +55,7 @@ function do_commit_changes {
         else
             commit_message="$(git diff --color $temp_changelog_file | perl -wlne 'print $1 if /^\e\[32m\+\e\[m\e\[32m(.*)\e\[m$/')"                        
             git add .
-            git commit -m "$commit_message" &> /dev/null || catch "Problem Occured While Commiting Changes!"
+            git commit -m "$commit_message" &> /dev/null || return $FALSE
         fi
     else
         warn_about_empty_changelog || return $FALSE

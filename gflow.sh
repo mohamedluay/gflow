@@ -11,7 +11,7 @@ global_directory="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pw
 . "$global_directory/modules/gflow_feature_flow.sh"
 . "$global_directory/modules/gflow_changelog.sh"
 . "$global_directory/modules/gflow_commit.sh"
-
+. "$global_directory/modules/gflow_hotfix_flow.sh"
 
 function print_guidlines {
      echo "
@@ -23,12 +23,6 @@ Wrong command, these are the commands supported so far
         - create_hotfix     Create Hotfix Flow
         - version           Get current prject version
     "
-}
-
-function catch {
-    local error="$1"
-    gflow_log_error "$error"
-    return 1
 }
 
 function revert_for_error {
@@ -53,7 +47,7 @@ if [ -z "$cmd" ]; then
     elif [ "$cmd" = "create_feature" ]; then    
         gflow_start_feature_flow || revert_for_error
     elif [ "$cmd" = "create_hotfix" ]; then            
-        create_hotfix
+        gflow_start_hotfix_flow || revert_for_error
     elif [ "$cmd" = "version" ]; then            
         get_current_version
         echo "${tmp_v[0]}.${tmp_v[1]}.${tmp_v[2]}"
