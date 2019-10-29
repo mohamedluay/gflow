@@ -3,12 +3,14 @@ set -o nounset
 global_directory="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
 . "$global_directory/modules/gflow_logger.sh"
+. "$global_directory/modules/gflow_graphical_selector.sh"
 . "$global_directory/modules/gflow_constants.sh"
 . "$global_directory/modules/gflow_config.sh"
 . "$global_directory/modules/gflow_init.sh"
 . "$global_directory/modules/gflow_git.sh"
 . "$global_directory/modules/gflow_feature_flow.sh"
 . "$global_directory/modules/gflow_changelog.sh"
+. "$global_directory/modules/gflow_commit.sh"
 
 
 function print_guidlines {
@@ -34,6 +36,9 @@ function revert_for_error {
     gflow_load_snapshopt
 }
 
+readonly TRUE=0
+readonly FALSE=1
+
 cmd="$1"
 subcmd="${2-default}"
 if [ -z "$cmd" ]; then
@@ -42,7 +47,7 @@ if [ -z "$cmd" ]; then
     if [ "$cmd" = "init" ]; then    
         init "$subcmd"
     elif [ "$cmd" = "commit" ]; then    
-        commit
+        gflow_commit || revert_for_error
     elif [ "$cmd" = "create_release" ]; then    
         create_release
     elif [ "$cmd" = "create_feature" ]; then    

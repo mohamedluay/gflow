@@ -44,13 +44,22 @@ function do_load_stashed {
 }
 
 function gflow_switch_to_branch {
+  local branch_to_switch="$1"
+  git checkout "$branch_to_switch" || return $FALSE
+  current_branch="$branch_to_switch"
+}
+
+function gflow_create_branch {
   local new_branch="$1"
-  local create_if_not_exists="${2-false}"
-  local checkout_from="$3"
-  if [ "$create_if_not_exists" = "create" ]; then
-    git checkout -b "$new_branch" $checkout_from || return 1
-  else
-    git checkout "$new_branch" $checkout_from || return 1
+  local checkout_from="$2"  
+  # ToDo: Ask User If he/she needs to checkout to an exisiting branch, hence won't create new changelog ... etc
+  git checkout -b "$new_branch" $checkout_from || return 1    
+  current_branch="$new_branch"
+}
+
+function is_protected_branch {  
+  if [ "$current_branch" = "master" ] || [ "$current_branch" = "develop" ]; then
+    return $TRUE
   fi
-   current_branch="$new_branch"
+  return $FALSE
 }
