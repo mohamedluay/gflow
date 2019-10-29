@@ -20,7 +20,8 @@ function switch_to_feature_branch {
   local feature_branch_name="$(ask_for_feature_branch_name)"
   ## Todo: check if branch name contains any restricted names  
   ## Todo: check if there is a branch with the same name exists
-  gflow_create_branch $feature_branch_name || return $FALSE
+  gflow_create_branch $feature_branch_name &> /dev/null || return $FALSE
+  gflow_log_successful "created & switched to branch $feature_branch_name"
 }
 
 function ask_for_feature_branch_name {

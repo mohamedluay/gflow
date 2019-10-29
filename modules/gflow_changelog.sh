@@ -16,49 +16,46 @@ function gflow_create_changelog {
 
 function create_temp_changelog_file {
   create_file "$temp_changelog_file"
-  # Todo Add Branch To TempChangelog
+  # Todo: create changelogs folder to through each branch changelog in it.
      echo "
-# Temp Changelog
-This File Will Contain the Temp Change log until this version get deployed, items in this change log will be added to your commit message by default
-
-## [Unreleased]
-## [$current_project_version_text] - $(date +%F_%H:%M:%S)
+## Changelog For [$current_branch] | From ($(date +%F_%H:%M:%S)) To () - ***Unreleased***
+Items in this change log will be added to your commit message by default
 
 ### Added
-[A]- 
-[A]- 
-[A]-
-[A]-
+[A]-   
+[A]-   
+[A]-  
+[A]-  
 
 ### Changed
-[C]- 
-[C]-
-[C]-
-[C]-
+[C]-   
+[C]-  
+[C]-  
+[C]-  
 
 ### Removed
-[R]- 
-[R]-
-[R]-
-[R]-
+[R]-   
+[R]-  
+[R]-  
+[R]-  
 
 ### Deprecated
-[D]- 
-[D]-
-[D]-
-[D]-
+[D]-   
+[D]-  
+[D]-  
+[D]-  
 
 ### Fixed
-[F]-
-[F]-
-[F]-
-[F]-
+[F]-  
+[F]-  
+[F]-  
+[F]-  
 
 ### Security
-[S]-
-[S]-
-[S]-
-[S]-
+[S]-  
+[S]-  
+[S]-  
+[S]-  
          
     " > $temp_changelog_file || return 1
 }

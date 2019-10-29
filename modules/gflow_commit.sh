@@ -47,6 +47,7 @@ function ask_if_to_commit_to_current_branch {
 
 function do_commit_changes {
     # ToDo: Check If tempchangelog file exists
+    # ToDo: Automatically Push Changes
     vim $temp_changelog_file
     if  does_temp_changelog_exists; then
         is_modified="$(git diff $temp_changelog_file)"
@@ -56,6 +57,7 @@ function do_commit_changes {
             commit_message="$(git diff --color $temp_changelog_file | perl -wlne 'print $1 if /^\e\[32m\+\e\[m\e\[32m(.*)\e\[m$/')"                        
             git add .
             git commit -m "$commit_message" &> /dev/null || return $FALSE
+            gflow_log_successful "$commit_message"
         fi
     else
         warn_about_empty_changelog || return $FALSE

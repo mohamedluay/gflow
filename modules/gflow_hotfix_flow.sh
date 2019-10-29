@@ -24,7 +24,8 @@ function switch_to_hotfix_branch {
   local hotfix_branch_name="hotfix-$new_version"
   ## Todo: check if there is a branch with the same name exists
   ## Todo: make sure that the master branch is up to date!
-  gflow_create_branch $hotfix_branch_name || return $FALSE
+  gflow_create_branch $hotfix_branch_name &> /dev/null || return $FALSE
+  gflow_log_successful "created & switched to branch $hotfix_branch_name"
   pump_hotfix_version "$new_version" || return $FALSE
 }
 
