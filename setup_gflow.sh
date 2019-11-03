@@ -1,21 +1,25 @@
 #!/usr/bin/env bash
+set -o nounset
 
-GLOBAL_FILE_PATH=/usr/local/bin/
-FILE_NAME=gflow
+GLOBAL_FILE_PATH="/usr/local/bin/"
+FILE_NAME="gflow"
+MODULES_DIR_NAME="modules/"
 
 USER_COMMAND=$1
-USER_SUB_COMMAND=$2
-NEW_GFLOW_VERSION=$(./gflow.sh gflow_version)
 
 function install {
     git pull origin master 
     cp "${FILE_NAME}.sh" "${GLOBAL_FILE_PATH}"
-    mv "${GLOBAL_FILE_PATH}${FILE_NAME}.sh" "${GLOBAL_FILE_PATH}${FILE_NAME}"
+    mv "${GLOBAL_FILE_PATH}${FILE_NAME}.sh" "${GLOBAL_FILE_PATH}${FILE_NAME}" 
     chmod u+x "${GLOBAL_FILE_PATH}${FILE_NAME}"
+
+    cp -rf "$MODULES_DIR_NAME" "${GLOBAL_FILE_PATH}${MODULES_DIR_NAME}"
+    chmod u+x "${GLOBAL_FILE_PATH}${MODULES_DIR_NAME}"
 }
 
 function uninstall {
     rm "${GLOBAL_FILE_PATH}${FILE_NAME}"
+    rm -rf "${GLOBAL_FILE_PATH}${MODULES_DIR_NAME}"
 }
 
 function update {
@@ -25,8 +29,7 @@ function update {
 
 function check_if_gflow_installed {
     if [ -f "${GLOBAL_FILE_PATH}${FILE_NAME}" ]; then
-        IS_GFLOW_INSTALLED=1
-        CURRENT_GFLOW_VERSION=$(gflow gflow_version)
+        IS_GFLOW_INSTALLED=1    
     else
         IS_GFLOW_INSTALLED=0
     fi
@@ -53,7 +56,7 @@ else
     elif [ "$USER_COMMAND" = "update" ]; then 
         if [ "$IS_GFLOW_INSTALLED" = 1 ]; then
 
-            echo "Updateing from Version $CURRENT_GFLOW_VERSION To Version $NEW_GFLOW_VERSION" 
+            echo "Updateing --------" 
             update > /dev/null 2>&1
             echo "Update Complete *********** "  
         else
@@ -61,7 +64,7 @@ else
         fi         
     elif [ "$USER_COMMAND" = "uninstall" ]; then  
         if [ "$IS_GFLOW_INSTALLED" = 1 ]; then
-            echo "Removing Version $CURRENT_GFLOW_VERSION From Device!!"  
+            echo "Removing Gflow From Device!!"  
             uninstall > /dev/null 2>&1
             echo "Gflow has been removed from your device"  
         else
