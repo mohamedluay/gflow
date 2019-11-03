@@ -14,7 +14,7 @@ global_directory="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pw
 . "$global_directory/modules/gflow_hotfix_flow.sh"
 . "$global_directory/modules/gflow_release_flow.sh"
 
-function print_guidlines {
+function print_guidlines {    
      echo "
 Wrong command, these are the commands supported so far
         - init              Init the Project's Workflow
@@ -24,6 +24,7 @@ Wrong command, these are the commands supported so far
         - create_hotfix     Create Hotfix Flow
         - version           Get current prject version
     "
+    gflow_log_highlight "Gflow Is Currently Runing On Version $gflow_version"
 }
 
 function revert_for_error {
@@ -34,7 +35,7 @@ function revert_for_error {
 readonly TRUE=0
 readonly FALSE=1
 
-cmd="$1"
+cmd="${1-guide}"
 subcmd="${2-default}"
 if [ -z "$cmd" ]; then
      print_guidlines
@@ -50,10 +51,8 @@ if [ -z "$cmd" ]; then
     elif [ "$cmd" = "create_hotfix" ]; then            
         gflow_start_hotfix_flow || revert_for_error
     elif [ "$cmd" = "version" ]; then            
-        get_current_version
-        echo "${tmp_v[0]}.${tmp_v[1]}.${tmp_v[2]}"
-    # elif [ "$cmd" = "release" ]; then    
-    #     create_release    
+        gflow_config_read_current_project_version
+        gflow_log_successful "$current_project_version_text"
     elif [ "$cmd" = "gflow_version" ]; then            
         echo "$gflow_version"   
     else
