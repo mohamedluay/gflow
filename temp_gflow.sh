@@ -379,7 +379,7 @@ function create_release {
     take_snapshot
     git checkout develop
     get_current_version
-    echo "The current version of the develop branch is ${tmp_v[0]}.${tmp_v[1]}.${tmp_v[2]}, which one you want to assign for the new release?!"
+    echo "The current version of the master branch is ${tmp_v[0]}.${tmp_v[1]}.${tmp_v[2]}, which one you want to assign for the new release?!"
     version_option_1="$((tmp_v[0] + 1)).0.0"
     version_option_2="${tmp_v[0]}.$((tmp_v[1] + 1)).0"
     version_option_3="${tmp_v[0]}.${tmp_v[1]}.$((tmp_v[2] + 1))"

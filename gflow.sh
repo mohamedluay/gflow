@@ -12,6 +12,7 @@ global_directory="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pw
 . "$global_directory/modules/gflow_changelog.sh"
 . "$global_directory/modules/gflow_commit.sh"
 . "$global_directory/modules/gflow_hotfix_flow.sh"
+. "$global_directory/modules/gflow_release_flow.sh"
 
 function print_guidlines {
      echo "
@@ -43,7 +44,7 @@ if [ -z "$cmd" ]; then
     elif [ "$cmd" = "commit" ]; then    
         gflow_commit || revert_for_error
     elif [ "$cmd" = "create_release" ]; then    
-        create_release
+        gflow_start_release_flow || revert_for_error
     elif [ "$cmd" = "create_feature" ]; then    
         gflow_start_feature_flow || revert_for_error
     elif [ "$cmd" = "create_hotfix" ]; then            

@@ -15,8 +15,7 @@ function gflow_start_feature_flow {
 }
 
 function switch_to_feature_branch {
-  gflow_switch_to_branch "develop" &> /dev/null || return $FALSE
-  gflow_log_highlight "What do you want to call this feature branch?"
+  gflow_switch_to_branch "develop" &> /dev/null || return $FALSE  
   local feature_branch_name="$(ask_for_feature_branch_name)"
   ## Todo: check if branch name contains any restricted names  
   ## Todo: check if there is a branch with the same name exists
@@ -25,6 +24,7 @@ function switch_to_feature_branch {
 }
 
 function ask_for_feature_branch_name {
+    gflow_log_highlight "What do you want to call this feature branch?"
     local __feature_branch_name
     read __feature_branch_name  
     echo "$__feature_branch_name"
